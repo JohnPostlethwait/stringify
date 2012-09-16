@@ -1,4 +1,4 @@
-var trim = require('trim');
+var oneliner = require('oneliner');
 
 
 module.exports = function(extra_extensions) {
@@ -21,7 +21,7 @@ module.exports = function(extra_extensions) {
 
   var middleware = function (bundle) {
     var text_handler = function (body, file) {
-      return 'module.exports = "' + trim(body) + '";\n';
+      return 'module.exports = "' + oneliner(body) + '";\n';
     };
 
     for (var i = 0; i < extensions.length; i++) {
