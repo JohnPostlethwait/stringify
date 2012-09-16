@@ -1,7 +1,7 @@
-var oneliner = require('oneliner');
 
+module.exports = function (extra_extensions) {
+  var oneliner = require('oneliner');
 
-module.exports = function(extra_extensions) {
   var extensions = [
     '.text',
     '.txt',
