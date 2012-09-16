@@ -21,7 +21,9 @@ module.exports = function (extra_extensions) {
 
   var middleware = function (bundle) {
     var text_handler = function (body, file) {
-      return 'module.exports = "' + oneliner(body) + '";\n';
+      var safe_body = oneliner(body).replace(/\"/g, '\u005C\u0022');
+
+      return 'module.exports = "' + safe_body + '";\n';
     };
 
     for (var i = 0; i < extensions.length; i++) {

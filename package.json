@@ -1,7 +1,7 @@
 {
   "name": "stringify",
   "description": "Browserify middleware to be able to require() text files (including templates) inside of your client-side JavaScript files.",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "./index.js",
   "keywords": [
     "browserify",
