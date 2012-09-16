@@ -1,0 +1,26 @@
+{
+  "name": "stringify",
+  "description": "Browserify middleware to be able to require() text files (including templates) inside of your client-side JavaScript files.",
+  "version": "0.0.3",
+  "main": "./index.js",
+  "keywords": [
+    "browserify",
+    "require",
+    "template"
+  ],
+  "repositories": [
+    {
+      "type": "git",
+      "url": "git://github.com/JohnPostlethwait/stringify.git"
+    }
+  ],
+  "dependencies": {
+    "trim": "0.0.1"
+  },
+  "licenses": [
+    {
+      "name": "MIT",
+      "url": "http://opensource.org/licenses/mit-license.php"
+    }
+  ]
+}
