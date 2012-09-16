@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Stringify by JohnPostlethwait</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Stringify</h1>
+          <h2>Browserify plugin to require() text files (templates) inside of your client-side JavaScript files.</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/JohnPostlethwait/stringify/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/JohnPostlethwait/stringify/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/JohnPostlethwait/stringify" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>Stringify</h1>
+
+<p>Browserify plugin to require() text files (like templates) inside of your client-side JavaScript files.</p>
+
+<h2>Installation</h2>
+
+<div class="highlight"><pre>npm install stringify
+</pre></div>
+
+<h2>Usage</h2>
+
+<p>Setup Browserify to use this middleware in your app:</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">browserify</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'browserify'</span><span class="p">),</span>
+    <span class="nx">stringify</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'stringify'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">bundle</span> <span class="o">=</span> <span class="nx">browserify</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">stringify</span><span class="p">([</span><span class="s1">'.hjs'</span><span class="p">,</span> <span class="s1">'.html'</span><span class="p">,</span> <span class="s1">'.whatever'</span><span class="p">]))</span>
+    <span class="p">.</span><span class="nx">addEntry</span><span class="p">(</span><span class="s1">'my_app_main.js'</span><span class="p">);</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">bundle</span><span class="p">);</span>
+</pre></div>
+
+<p>You might have noticed that you can pass stringify an optional array of file-extensions that you want to require() in your Browserify packages as strings. By default these are used: .html, .txt, .text, and .tmpl</p>
+
+<p><strong>NOTE</strong>: You MUST call this as I have above. The Browserify .use() method HAS to plug this middleware in to Browserify BEFORE you add the entry point (your main client-side file) for Browserify.</p>
+
+<p>Now, in your clientside files you can use require() as you would for JSON and JavaScript files, but include text files that have just been parsed into a JavaScript string:</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">my_text</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'../path/to/my/text/file.txt'</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">my_text</span><span class="p">);</span>
+</pre></div>
+
+<h2>More Realistic Example &amp; Use-Case</h2>
+
+<p>The reason I created this was to get string versions of my Handlebars templates required in to my client-side JavaScript. You can theoretically use this for any templating parser though.</p>
+
+<p>Here is how that is done:</p>
+
+<p>application.js:</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">browserify</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'browserify'</span><span class="p">),</span>
+    <span class="nx">stringify</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'stringify'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">bundle</span> <span class="o">=</span> <span class="nx">browserify</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">stringify</span><span class="p">([</span><span class="s1">'.hbs'</span><span class="p">,</span> <span class="s1">'.handlebars'</span><span class="p">]))</span>
+    <span class="p">.</span><span class="nx">addEntry</span><span class="p">(</span><span class="s1">'my_app_main.js'</span><span class="p">);</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">bundle</span><span class="p">);</span>
+</pre></div>
+
+<p>my_app_main.js:</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">Handlebars</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'handlebars'</span><span class="p">),</span>
+    <span class="nx">template</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'my/template/path.hbs'</span><span class="p">),</span>
+    <span class="nx">data</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'data.json'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">hbs_template</span> <span class="o">=</span> <span class="nx">Handlebars</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">template</span><span class="p">);</span>
+
+<span class="c1">// Now I can use hbs_template like I would anywhere else, passing it data and getting constructed HTML back.</span>
+<span class="kd">var</span> <span class="nx">constructed_template</span> <span class="o">=</span> <span class="nx">hbs_template</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+
+<span class="cm">/*</span>
+<span class="cm">  Now 'constructed_template' is ready to be appended to the DOM in the page!</span>
+<span class="cm">  The result of it should be:</span>
+
+<span class="cm">  &lt;p&gt;This is my string!&lt;/p&gt;</span>
+<span class="cm">*/</span>
+</pre></div>
+
+<p>my/template/path.hbs:</p>
+
+<div class="highlight"><pre><span class="nt">&lt;p&gt;</span>{{ json_data }}<span class="nt">&lt;/p&gt;</span>
+</pre></div>
+
+<p>data.json</p>
+
+<div class="highlight"><pre><span class="p">{</span>
+  <span class="nt">"json_data"</span><span class="p">:</span> <span class="s2">"This is my string!"</span>
+<span class="p">}</span>
+</pre></div>
+        </section>
+
+        <footer>
+          Stringify is maintained by <a href="https://github.com/JohnPostlethwait">JohnPostlethwait</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
