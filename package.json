@@ -1,22 +1,24 @@
 {
   "name": "stringify",
   "description": "Browserify middleware to be able to require() text files (including templates) inside of your client-side JavaScript files.",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "main": "./index.js",
+  "author": "John Postlethwait <john.postlethwait@gmail.com>",
   "website": "http://johnpostlethwait.github.com/stringify/",
   "keywords": [
     "browserify",
     "require",
-    "template"
+    "template",
+    "text",
+    "txt",
+    "client-side"
   ],
-  "repositories": [
-    {
-      "type": "git",
-      "url": "git://github.com/JohnPostlethwait/stringify.git"
-    }
-  ],
-  "dependencies": {
-    "oneliner": "0.0.8"
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/JohnPostlethwait/stringify.git"
+  },
+  "engines" : {
+    "node" : "*"
   },
   "licenses": [
     {
