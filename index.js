@@ -21,14 +21,11 @@ module.exports = function (extra_extensions) {
   var middleware = function (bundle) {
 
     function stringifyText(text) {
-      var stringified_text;
-
-      stringified_text = text.replace(/\"/g, '\u005C\u0022');
-      stringified_text = stringified_text.replace(/^(.*)/gm, '"$1');
-      stringified_text = stringified_text.replace(/(.+)$/gm, '$1" +');
-      stringified_text = stringified_text.replace(/\+$/, '');
-
-      return stringified_text;
+      return '"' + text
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r')
+        .replace(/"/g, '\\"')
+        + '"';
     }
 
     var text_handler = function (body, file) {
