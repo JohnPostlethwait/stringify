@@ -8,15 +8,15 @@ module.exports = function (extra_extensions) {
     '.tmpl'
   ];
 
-  if (Object.prototype.toString.call(extra_extensions) !== '[object Array]') {
-    extra_extensions = [];
+  if (!Array.isArray(extra_extensions)) {
+    extra_extensions = Array.prototype.slice.call(arguments);
   }
 
-  for (var i = 0; i < extra_extensions.length; i++) {
-    if (extensions[extra_extensions[i]]) { continue; }
-
-    extensions.push(extra_extensions[i]);
-  }
+  extra_extensions.forEach(function(ext) {
+    if (extensions.indexOf(ext) == -1) {
+      extensions.push(ext);
+    }
+  });
 
   var middleware = function (bundle) {
 
