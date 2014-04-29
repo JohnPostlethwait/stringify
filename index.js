@@ -1,46 +1,83 @@
+var through = require('through');
 
-module.exports = function (extra_extensions) {
+/**
+ * Stringifies the content
+ * @param   {string}    content
+ * @returns {string}
+ */
+function stringify(content) {
+	var stringified_content;
 
-  var extensions = [
-    '.text',
-    '.txt',
-    '.html',
-    '.tmpl'
-  ];
+	stringified_content = content.replace(/\"/g, '\u005C\u0022');
+	stringified_content = stringified_content.replace(/^(.*)/gm, '"$1');
+	stringified_content = stringified_content.replace(/(.+)$/gm, '$1" +');
+	stringified_content = stringified_content.replace(/\+$/, '');
 
-  if (Object.prototype.toString.call(extra_extensions) !== '[object Array]') {
-    extra_extensions = [];
-  }
+	return 'module.exports = '+stringified_content+';\n';
+}
 
-  for (var i = 0; i < extra_extensions.length; i++) {
-    if (extensions[extra_extensions[i]]) { continue; }
+/**
+ * Creates the
+ * @param   {object}    options
+ * @param   {object}    options.extensions
+ * @returns {stream}
+ */
+module.exports = function(options) {
 
-    extensions.push(extra_extensions[i]);
-  }
+	/**
+	 * The file extensions of file which should be stringified
+	 * @type    {string[]}
+	 */
+	var extensions = [
+		'.text',
+		'.txt',
+		'.html',
+		'.tmpl',
+		'.tpl'
+	];
 
-  var middleware = function (bundle) {
+	if (options && options.extensions) {
+		extensions = options.extensions;
+	}
 
-    function stringifyText(text) {
-      var stringified_text;
+	/**
+	 * Returns whether the file ends in an extension
+	 * @param   {string} file
+	 * @return  {boolean}
+	 */
+	function has_stringify_extension(file) {
+		for (var i=0; i<extensions.length; ++i) {
+			if (file.substr(-1*extensions[i].length) === extensions[i]) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-      stringified_text = text.replace(/\"/g, '\u005C\u0022');
-      stringified_text = stringified_text.replace(/^(.*)/gm, '"$1');
-      stringified_text = stringified_text.replace(/(.+)$/gm, '$1" +');
-      stringified_text = stringified_text.replace(/\+$/, '');
+	/**
+	 * The browserify transform method
+	 * @param   {string} file
+	 * @returns {stream}
+	 */
+	function transform(file) {
+		var content = '';
 
-      return stringified_text;
-    }
+		if (!has_stringify_extension(file)) {
+			return through();
+		}
 
-    var text_handler = function (body, file) {
-      var safe_body = stringifyText(body);
 
-      return 'module.exports = ' + safe_body + ';\n';
-    };
+		function write(buffer) {
+			content += buffer;
+		}
 
-    for (var i = 0; i < extensions.length; i++) {
-      bundle.register(extensions[i], text_handler);
-    }
-  };
+		function end() {
+			this.queue(stringify(content));
+			this.queue(null);
+		}
 
-  return middleware;
+		return through(write, end);
+	};
+
+	return transform;
 };

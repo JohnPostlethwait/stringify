@@ -17,14 +17,14 @@ var browserify = require('browserify'),
     stringify = require('stringify');
 
 var bundle = browserify()
-    .use(stringify(['.hjs', '.html', '.whatever']))
-    .addEntry('my_app_main.js');
+    .transform(stringify(['.hjs', '.html', '.whatever']))
+    .add('my_app_main.js');
 
 app.use(bundle);
 ```
 You might have noticed that you can pass stringify an optional array of file-extensions that you want to require() in your Browserify packages as strings. By default these are used: .html, .txt, .text, and .tmpl
 
-__NOTE__: You MUST call this as I have above. The Browserify .use() method HAS to plug this middleware in to Browserify BEFORE you add the entry point (your main client-side file) for Browserify.
+__NOTE__: You MUST call this as I have above. The Browserify .transform() method HAS to plug this middleware in to Browserify BEFORE you add the entry point (your main client-side file) for Browserify.
 
 Now, in your clientside files you can use require() as you would for JSON and JavaScript files, but include text files that have just been parsed into a JavaScript string:
 
@@ -46,7 +46,7 @@ var browserify = require('browserify'),
     stringify = require('stringify');
 
 var bundle = browserify()
-    .use(stringify(['.hbs', '.handlebars']))
+    .transform(stringify(['.hbs', '.handlebars']))
     .addEntry('my_app_main.js');
 
 app.use(bundle);
