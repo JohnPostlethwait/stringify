@@ -5,7 +5,8 @@
   "main": "./index.js",
   "author": "John Postlethwait <john.postlethwait@gmail.com>",
   "contributors": [
-	  "James Newell <james@digitaledgeit.com.au>"
+    "James Newell <james@digitaledgeit.com.au>",
+    "Livoras <livoras@163.com>"
   ],
   "website": "http://johnpostlethwait.github.com/stringify/",
   "keywords": [
@@ -20,13 +21,16 @@
     "type": "git",
     "url": "git://github.com/JohnPostlethwait/stringify.git"
   },
-  "engines" : {
-    "node" : "*"
+  "engines": {
+    "node": "*"
   },
   "licenses": [
     {
       "name": "MIT",
       "url": "http://opensource.org/licenses/mit-license.php"
     }
-  ]
+  ],
+  "devDependencies": {
+    "through": "~2.3.4"
+  }
 }
