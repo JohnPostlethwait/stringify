@@ -13,13 +13,13 @@ function stringify(content) {
 	stringified_content = stringified_content.replace(/(.+)$/gm, '$1" +');
 	stringified_content = stringified_content.replace(/\+$/, '');
 
-	return 'module.exports = '+stringified_content+';\n';
+	return 'module.exports = ' + stringified_content + ';\n';
 }
 
 /**
  * Creates the
- * @param   {object}    options
- * @param   {object}    options.extensions
+ * @param   {object | array}    options
+ * @param   {object}            options.extensions
  * @returns {stream}
  */
 module.exports = function(options) {
@@ -36,8 +36,12 @@ module.exports = function(options) {
 		'.tpl'
 	];
 
-	if (options && options.extensions) {
-		extensions = options.extensions;
+	if (options) {
+		if (Object.prototype.toString.call(options) === '[object Array]') {
+			extensions = options;
+		} else if(options.extensions) {
+			extensions = options.extensions;
+		}
 	}
 
 	/**
