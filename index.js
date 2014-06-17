@@ -1,3 +1,4 @@
+var path = require('path');
 var through = require('through');
 
 /**
@@ -6,14 +7,7 @@ var through = require('through');
  * @returns {string}
  */
 function stringify(content) {
-	var stringified_content;
-
-	stringified_content = content.replace(/\"/g, '\u005C\u0022');
-	stringified_content = stringified_content.replace(/^(.*)/gm, '"$1');
-	stringified_content = stringified_content.replace(/(.+)$/gm, '$1" +');
-	stringified_content = stringified_content.replace(/\+$/, '');
-
-	return 'module.exports = ' + stringified_content + ';\n';
+	return 'module.exports = ' + JSON.stringify(content) + ';\n';
 }
 
 /**
@@ -44,18 +38,19 @@ module.exports = function(options) {
 		}
 	}
 
+	// lowercase all file extensions for case-insensitive matching
+	extensions = extensions.map(function (ext) {
+		return ext.toLowerCase();
+	});
+
 	/**
-	 * Returns whether the file ends in an extension
-	 * @param   {string} file
+	 * Returns whether the filename ends in an extension
+	 * @param   {string} filename
 	 * @return  {boolean}
 	 */
-	function has_stringify_extension(file) {
-		for (var i=0; i<extensions.length; ++i) {
-			if (file.substr(-1*extensions[i].length) === extensions[i]) {
-				return true;
-			}
-		}
-		return false;
+	function has_stringify_extension(filename) {
+		var ext = path.extname(filename).toLowerCase();
+		return extensions.indexOf(ext) > -1;
 	}
 
 	/**
@@ -64,19 +59,19 @@ module.exports = function(options) {
 	 * @returns {stream}
 	 */
 	function transform(file) {
-		var content = '';
-
 		if (!has_stringify_extension(file)) {
 			return through();
 		}
 
+		var chunks = [];
 
 		function write(buffer) {
-			content += buffer;
+			chunks.push(buffer);
 		}
 
 		function end() {
-			this.queue(stringify(content));
+			var contents = Buffer.concat(chunks).toString('utf8');
+			this.queue(stringify(contents));
 			this.queue(null);
 		}
 
