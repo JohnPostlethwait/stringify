@@ -8,10 +8,11 @@ var through = require('through');
 function stringify(content) {
 	var stringified_content;
 
-	stringified_content = content.replace(/\"/g, '\u005C\u0022');
-	stringified_content = stringified_content.replace(/^(.*)/gm, '"$1');
-	stringified_content = stringified_content.replace(/(.+)$/gm, '$1" +');
-	stringified_content = stringified_content.replace(/\+$/, '');
+	stringified_content = '"' + content
+		.replace(/\n/g, '\\n')
+		.replace(/\r/g, '\\r')
+		.replace(/"/g, '\\"')
+		+ '"';
 
 	return 'module.exports = ' + stringified_content + ';\n';
 }
