@@ -83,11 +83,12 @@ my/template/path.hbs:
 
 If you would like to contribute code, please do the following:
 
-1) Fork this repository and make your changes.
-2) Add your name to the "contributors" section in the `package.json` file.
-3) Squash all of your commits into a single commit via `git rebase -i`.
-4) Run the tests by running `npm install && make test` from the source directory.
-5) Assuming those pass, send the Pull Request off to me for review!
+1. Fork this repository and make your changes.
+2. Write tests for any new functionality. If you are fixing a bug that tests did not cover, please make a test that reproduces the bug.
+3. Add your name to the "contributors" section in the `package.json` file.
+4. Squash all of your commits into a single commit via `git rebase -i`.
+5. Run the tests by running `npm install && make test` from the source directory.
+6. Assuming those pass, send the Pull Request off to me for review!
 
 Please do not iterate the package.json version number – I will do that myself when I publish it to NPM.
 
