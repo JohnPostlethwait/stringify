@@ -1,6 +1,6 @@
 # Stringify #
 
-Browserify plugin to require() text files (like templates) inside of your client-side JavaScript files.
+Browserify plugin to require() text files (such as HTML templates) inside of your client-side JavaScript files.
 
 ## Installation ##
 
@@ -22,6 +22,7 @@ var bundle = browserify()
 
 app.use(bundle);
 ```
+
 You might have noticed that you can pass stringify an optional array of file-extensions that you want to require() in your Browserify packages as strings. By default these are used: .html, .txt, .text, and .tmpl
 
 __NOTE__: You MUST call this as I have above. The Browserify .transform() method HAS to plug this middleware in to Browserify BEFORE you add the entry point (your main client-side file) for Browserify.
@@ -56,7 +57,9 @@ my_app_main.js:
 ```javascript
 var Handlebars = require('handlebars'),
     template = require('my/template/path.hbs'),
-    data = require('data.json');
+    data = {
+      "json_data": "This is my string!"
+    };
 
 var hbs_template = Handlebars.compile(template);
 
@@ -76,9 +79,22 @@ my/template/path.hbs:
 <p>{{ json_data }}</p>
 ```
 
-data.json
-```json
-{
-  "json_data": "This is my string!"
-}
-```
+## Contributing ##
+
+If you would like to contribute code, please do the following:
+
+1) Fork this repository and make your changes.
+2) Add your name to the "contributors" section in the `package.json` file.
+3) Squash all of your commits into a single commit via `git rebase -i`.
+4) Run the tests by running `npm install && make test` from the source directory.
+5) Assuming those pass, send the Pull Request off to me for review!
+
+Please do not iterate the package.json version number – I will do that myself when I publish it to NPM.
+
+### Style-Guide ###
+
+Please follow this simple style-guide for all code contributions:
+
+* Indent using spaces.
+* camelCase all callables.
+* Place a space after a conditional or function name, and its conditions/arguments. `function (...) {...}`

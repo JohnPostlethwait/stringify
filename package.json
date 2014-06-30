@@ -1,11 +1,12 @@
 {
   "name": "stringify",
   "description": "Browserify middleware to be able to require() text files (including templates) inside of your client-side JavaScript files.",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "main": "./index.js",
   "author": "John Postlethwait <john.postlethwait@gmail.com>",
   "contributors": [
     "James Newell <james@digitaledgeit.com.au>",
+    "Kevin Ingersoll <kingersoll@gmail.com>",
     "Livoras <livoras@163.com>"
   ],
   "website": "http://johnpostlethwait.github.com/stringify/",
@@ -32,5 +33,9 @@
   ],
   "dependencies": {
     "through": "~2.3.4"
+  },
+  "devDependencies": {
+    "mocha": "1.20.1",
+    "should": "4.0.4"
   }
 }
