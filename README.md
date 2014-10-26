@@ -35,6 +35,58 @@ var my_text = require('../path/to/my/text/file.txt');
 console.log(my_text);
 ```
 
+If you require an HTML file and you want to minify the requested string, you can configure Stringify to do it:
+
+```javascript
+stringify({
+  extensions: ['.txt', '.html'],
+  minify: true,
+  minifier: {
+    extensions: ['.html'],
+    options: {
+      // html-minifier options
+    }
+  }
+})
+```
+
+__minifier__ options are optional.  
+
+Default __minifier.extensions__:
+
+```javascript
+['.html', '.htm', '.tmpl', '.tpl', '.hbs']
+```
+
+Default __minifier.options__ (for more informations or to override those options, please go to [html-minifier github](https://github.com/kangax/html-minifier)):
+
+```javascript
+{
+  removeComments: true,
+  removeCommentsFromCDATA: true,
+  removeCDATASectionsFromCDATA: true,
+  collapseWhitespace: true,
+  conservativeCollapse: false,
+  preserveLineBreaks: false,
+  collapseBooleanAttributes: false,
+  removeAttributeQuotes: true,
+  removeRedundantAttributes: false,
+  useShortDoctype: false,
+  removeEmptyAttributes: false,
+  removeScriptTypeAttributes: false,
+  removeStyleLinkTypeAttributes: false,
+  removeOptionalTags: false,
+  removeIgnored: false,
+  removeEmptyElements: false,
+  lint: false,
+  keepClosingSlash: false,
+  caseSensitive: false,
+  minifyJS: false,
+  minifyCSS: false,
+  minifyURLs: false
+}
+```
+
 ## More Realistic Example & Use-Case ##
 
 The reason I created this was to get string versions of my Handlebars templates required in to my client-side JavaScript. You can theoretically use this for any templating parser though.

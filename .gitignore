@@ -10,6 +10,12 @@ lib-cov
 pids
 logs
 results
+coverage
 
 node_modules
 npm-debug.log
+
+.idea
+*.iml
+.settings
+.project
