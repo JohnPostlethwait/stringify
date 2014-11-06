@@ -87,6 +87,23 @@ Default __minifier.options__ (for more informations or to override those options
 }
 ```
 
+## Usage with gulp and gulp-browserify
+
+To incorporate stringify into a `gulp` build process using `gulp-browserify`, register `stringify` as a transform as follows:
+
+```javascript
+gulp.task('js', function() {
+  return gulp.src('src/main.js', { read: false })
+    .pipe(browserify({
+      transform: stringify({
+        extensions: ['.html'], minify: true
+      })
+    }))
+    .pipe(gif(env !== 'dev', uglify()))
+    .pipe(gulp.dest(paths.build));
+});
+```
+
 ## More Realistic Example & Use-Case ##
 
 The reason I created this was to get string versions of my Handlebars templates required in to my client-side JavaScript. You can theoretically use this for any templating parser though.
