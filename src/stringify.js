@@ -62,7 +62,7 @@ function getExtensions (options) {
    * The file extensions which are stringified by default.
    * @type    {string[]}
    */
-  var extensions = DEFAULT_EXTENSIONS;
+  var extensions = module.exports.DEFAULT_EXTENSIONS;
 
   if (options) {
     if (Object.prototype.toString.call(options) === '[object Array]') {
@@ -91,8 +91,8 @@ function getMinifierOptions (_options) {
   var minifier = options.minifier || {};
   return {
     requested : !!options.minify,
-    extensions: minifier.extensions || DEFAULT_MINIFIER_EXTENSIONS,
-    options: minifier.options || DEFAULT_MINIFIER_OPTIONS
+    extensions: minifier.extensions || module.exports.DEFAULT_MINIFIER_EXTENSIONS,
+    options: minifier.options || module.exports.DEFAULT_MINIFIER_OPTIONS
   };
 }
 
@@ -116,9 +116,9 @@ function hasStringifiableExtension (filename, extensions) {
  * @return  {string}
  */
 function minify(filename, contents, options) {
-  var minifier = getMinifierOptions(options);
+  var minifier = module.exports.getMinifierOptions(options);
 
-  if (minifier.requested && hasStringifiableExtension(filename, minifier.extensions)) {
+  if (minifier.requested && module.exports.hasStringifiableExtension(filename, minifier.extensions)) {
     return htmlMinifier.minify(contents, minifier.options);
   }
 
@@ -133,7 +133,7 @@ function minify(filename, contents, options) {
  * @returns {stream}
  */
 module.exports = function (options) {
-  var extensions = getExtensions(options);
+	var extensions = module.exports.getExtensions(options);
 
   /**
    * The function Browserify will use to transform the input.
@@ -141,7 +141,7 @@ module.exports = function (options) {
    * @returns {stream}
    */
   function browserifyTransform (file) {
-    if (!hasStringifiableExtension(file, extensions)) {
+  	if (!module.exports.hasStringifiableExtension(file, extensions)) {
       return through();
     }
     var chunks = [];
@@ -153,7 +153,7 @@ module.exports = function (options) {
     var end = function () {
       var contents = Buffer.concat(chunks).toString('utf8');
 
-      this.queue(stringify(minify(file, contents, options)));
+      this.queue(module.exports.stringify(module.exports.minify(file, contents, options)));
       this.queue(null);
     };
 
@@ -163,14 +163,12 @@ module.exports = function (options) {
   return browserifyTransform;
 };
 
-// Test-environment specific exports...
-if (process.env.NODE_ENV) {
-  module.exports.stringify                   = stringify;
-  module.exports.getExtensions               = getExtensions;
-  module.exports.DEFAULT_EXTENSIONS          = DEFAULT_EXTENSIONS;
-  module.exports.hasStringifiableExtension   = hasStringifiableExtension;
-  module.exports.minify                      = minify;
-  module.exports.getMinifierOptions          = getMinifierOptions;
-  module.exports.DEFAULT_MINIFIER_EXTENSIONS = DEFAULT_MINIFIER_EXTENSIONS;
-  module.exports.DEFAULT_MINIFIER_OPTIONS    = DEFAULT_MINIFIER_OPTIONS;
-}
+// Allow specific exports to be overriden if wanted...
+module.exports.stringify                   = stringify;
+module.exports.getExtensions               = getExtensions;
+module.exports.DEFAULT_EXTENSIONS          = DEFAULT_EXTENSIONS;
+module.exports.hasStringifiableExtension   = hasStringifiableExtension;
+module.exports.minify                      = minify;
+module.exports.getMinifierOptions          = getMinifierOptions;
+module.exports.DEFAULT_MINIFIER_EXTENSIONS = DEFAULT_MINIFIER_EXTENSIONS;
+module.exports.DEFAULT_MINIFIER_OPTIONS    = DEFAULT_MINIFIER_OPTIONS;
