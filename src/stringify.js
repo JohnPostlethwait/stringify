@@ -125,15 +125,21 @@ function minify(filename, contents, options) {
   return contents;
 }
 
+
 /**
- * Creates the Browserify transform function which Browserify will pass the
- * file to.
+ * Exposes the Browserify transform function.
+ *
+ * This handles two use cases:
+ * - Factory: given no arguments or options as first argument it returns
+ *   the transform function
+ * - Standard: given file (and optionally options) as arguments a stream is
+ *   returned. This follows the standard pattern for browserify transformers.
+ *
+ * @param   {string}            file
  * @param   {object | array}    options
- * @param   {object}            options.extensions
- * @returns {stream}
+ * @returns {stream | function} depending on if first argument is string.
  */
-module.exports = function (options) {
-  var extensions = getExtensions(options);
+module.exports = function (file, options) {
 
   /**
    * The function Browserify will use to transform the input.
@@ -141,6 +147,9 @@ module.exports = function (options) {
    * @returns {stream}
    */
   function browserifyTransform (file) {
+    options = options || {};
+    var extensions = getExtensions(options);
+
     if (!hasStringifiableExtension(file, extensions)) {
       return through();
     }
@@ -160,7 +169,13 @@ module.exports = function (options) {
     return through(write, end);
   }
 
-  return browserifyTransform;
+  if (typeof file !== 'string') {
+    // Factory: return function (first argument is options)
+    options = file;
+    return browserifyTransform;
+  } else {
+    return browserifyTransform(file);
+  }
 };
 
 // Test-environment specific exports...

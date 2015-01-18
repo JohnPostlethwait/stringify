@@ -10,7 +10,7 @@ npm install stringify
 
 ## Usage ##
 
-Setup Browserify to use this middleware in your app:
+Use it directly from the command line `browserity -t stringify myfile.js` or setup Browserify to use this middleware in your app:
 
 ```javascript
 var browserify = require('browserify'),

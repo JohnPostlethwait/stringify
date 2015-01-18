@@ -1,40 +1,142 @@
 /* jshint expr: true */
 /* global describe: false, it: false, before: false */
 'use strict';
-var path      = require('path'),
-    should    = require('should'),
-    Stringify = require('../index');
+var should    = require('should'),
+    spec      = require('stream-spec'),
+    stringify = require('../index');
+
+
+function write(data, stream) {
+  function next() {
+    if(stream.write(data) === false) {
+      return stream.once('drain', next);
+    }
+    stream.end();
+  }
+  next();
+}
+
+function read(stream, callback) {
+  var returned = [];
+  stream.on('data', function (data) {
+    returned.push(data);
+  });
+  stream.once('end', function () {
+    callback(null, returned);
+  });
+  stream.once('error', function (err) {
+    callback(err);
+  });
+}
 
 describe('when the module is required', function () {
   it('should return a function', function () {
-    Stringify.should.be.a.Function;
+    stringify.should.be.a.Function;
   });
 });
 
-describe('when the module is instantiated', function () {
+describe('when the module called', function () {
+
   describe('with no options', function () {
     before(function () {
-      this.stringify = new Stringify();
+      this.transformerFactory = stringify();
     });
 
-    it('should return a function named "browserifyTransform"', function () {
-      this.stringify.name.should.be.exactly('browserifyTransform');
+    it('should return a factory function named "browserifyTransform"', function () {
+      this.transformerFactory.name.should.be.exactly('browserifyTransform');
     });
 
-    describe('when the return value is called with a valid file path', function () {
+    describe('when the returned function is called with a valid file path', function () {
       before(function () {
-        var fixture = path.join(path.dirname('.'), 'file_fixture.txt');
-
-        this.stringified = this.stringify(fixture);
+        this.transformer = this.transformerFactory('file_fixture.txt');
       });
 
       // TODO: Perhaps not the most reliable way to check if it is a Stream...
       it('should return a Stream object', function () {
-        should(this.stringified.writable).ok;
-        should(this.stringified.readable).ok;
-        this.stringified.write.should.be.a.Function;
-        this.stringified.end.should.be.a.Function;
+        should(this.transformer.writable).ok;
+        should(this.transformer.readable).ok;
+        this.transformer.write.should.be.a.Function;
+        this.transformer.end.should.be.a.Function;
       });
     });
   });
+
+  describe('with options as first argument', function () {
+    before(function () {
+      this.transformer = stringify({
+        extensions: ['.html']
+      });
+    });
+
+    it('should return a function named "browserifyTransform"', function () {
+      this.transformer.name.should.be.exactly('browserifyTransform');
+    });
+  });
+
+  describe('with a HTML file as first argument', function () {
+    before(function () {
+      this.transformer = stringify('a_file.html', {
+        extensions: ['.html'],
+        minify: true,
+        minifier: {
+          extensions: ['.html']
+        }
+      });
+    });
+
+    it('should return a Stream object', function () {
+      should(this.transformer.writable).ok;
+      should(this.transformer.readable).ok;
+      this.transformer.write.should.be.a.Function;
+      this.transformer.end.should.be.a.Function;
+    });
+
+    it('should respond to input', function () {
+      var s = spec(this.transformer).pausable();
+      var input = '<p   style="color: grey;"   >   should   be   minified   </p>';
+      var exp = 'module.exports = \"<p style=\\"color: grey\\">should be minified</p>";\n';
+
+      read(this.transformer, function (err, returnedData) {
+        should(err).be.null;
+        should(returnedData).be.an.array;
+        should(returnedData.length).be.equal(1);
+        should(returnedData[0]).be.equal(exp);
+      });
+
+      this.transformer.on('close', s.validate);
+
+      write(input, this.transformer);
+    });
+  });
+
+  describe('with an unknown file as first argument', function () {
+    before(function () {
+      this.transformer = stringify('a_file.foo');
+    });
+
+    it('should return a Stream object', function () {
+      should(this.transformer.writable).ok;
+      should(this.transformer.readable).ok;
+      this.transformer.write.should.be.a.Function;
+      this.transformer.end.should.be.a.Function;
+    });
+
+    it('should respond without transformation', function () {
+      var s = spec(this.transformer).pausable();
+      var input = '<p   style="color: grey;"   >   should   be   minified   </p>';
+      var exp = input;
+
+      read(this.transformer, function (err, returnedData) {
+        should(err).be.null;
+        should(returnedData).be.an.array;
+        should(returnedData.length).be.equal(1);
+        should(returnedData[0]).be.equal(exp);
+      });
+
+      this.transformer.on('close', s.validate);
+
+      write(input, this.transformer);
+    });
+  });
+
 });
