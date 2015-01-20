@@ -5,6 +5,9 @@ var should    = require('should'),
     spec      = require('stream-spec'),
     stringify = require('../index');
 
+var input = '<p   style="color: grey;"   >   should   be   minified   </p>';
+var outputTransformed = 'module.exports = \"<p style=\\"color: grey\\">should be minified</p>";\n';
+
 
 function write(data, stream) {
   function next() {
@@ -63,13 +66,35 @@ describe('when the module called', function () {
 
   describe('with options as first argument', function () {
     before(function () {
-      this.transformer = stringify({
-        extensions: ['.html']
+      console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxx');
+      this.transformerFactory = stringify({
+        extensions: ['.xxx'],
+        minify: true,
+        minifier: {
+          extensions: ['.xxx']
+        }
+
       });
     });
 
     it('should return a function named "browserifyTransform"', function () {
-      this.transformer.name.should.be.exactly('browserifyTransform');
+      this.transformerFactory.name.should.be.exactly('browserifyTransform');
+    });
+
+    it('should respond to input with the given options', function () {
+      var transformer = this.transformerFactory('a_file.xxx');
+      var s = spec(transformer).pausable();
+
+      read(transformer, function (err, returnedData) {
+        should(err).be.null;
+        should(returnedData).be.an.array;
+        should(returnedData.length).be.equal(1);
+        should(returnedData[0]).be.equal(outputTransformed);
+      });
+
+      transformer.on('close', s.validate);
+
+      write(input, transformer);
     });
   });
 
@@ -93,14 +118,12 @@ describe('when the module called', function () {
 
     it('should respond to input', function () {
       var s = spec(this.transformer).pausable();
-      var input = '<p   style="color: grey;"   >   should   be   minified   </p>';
-      var exp = 'module.exports = \"<p style=\\"color: grey\\">should be minified</p>";\n';
 
       read(this.transformer, function (err, returnedData) {
         should(err).be.null;
         should(returnedData).be.an.array;
         should(returnedData.length).be.equal(1);
-        should(returnedData[0]).be.equal(exp);
+        should(returnedData[0]).be.equal(outputTransformed);
       });
 
       this.transformer.on('close', s.validate);
@@ -123,14 +146,12 @@ describe('when the module called', function () {
 
     it('should respond without transformation', function () {
       var s = spec(this.transformer).pausable();
-      var input = '<p   style="color: grey;"   >   should   be   minified   </p>';
-      var exp = input;
 
       read(this.transformer, function (err, returnedData) {
         should(err).be.null;
         should(returnedData).be.an.array;
         should(returnedData.length).be.equal(1);
-        should(returnedData[0]).be.equal(exp);
+        should(returnedData[0]).be.equal(input);
       });
 
       this.transformer.on('close', s.validate);

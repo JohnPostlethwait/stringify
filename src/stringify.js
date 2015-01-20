@@ -147,7 +147,6 @@ module.exports = function (file, options) {
    * @returns {stream}
    */
   function browserifyTransform (file) {
-    options = options || {};
     var extensions = getExtensions(options);
 
     if (!hasStringifiableExtension(file, extensions)) {
@@ -170,7 +169,9 @@ module.exports = function (file, options) {
   }
 
   if (typeof file !== 'string') {
-    // Factory: return function (first argument is options)
+    // Factory: return a function.
+    // Set options variable here so it is ready for when browserifyTransform
+    // is called. Note: first argument is the options.
     options = file;
     return browserifyTransform;
   } else {
