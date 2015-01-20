@@ -8,7 +8,8 @@
     "James Newell <james@digitaledgeit.com.au>",
     "Kevin Ingersoll <kingersoll@gmail.com>",
     "Livoras <livoras@163.com>",
-    "Sébastien David <sebastien.david.1983@gmail.com>"
+    "Sébastien David <sebastien.david.1983@gmail.com>",
+    "Kenneth Skovhus <kenneth.skovhus@gmail.com>"
   ],
   "website": "http://johnpostlethwait.github.com/stringify/",
   "keywords": [
@@ -34,6 +35,7 @@
   ],
   "dependencies": {
     "html-minifier": "^0.6.9",
+    "stream-spec": "~0.3.5",
     "through": "^2.3.4"
   },
   "devDependencies": {
