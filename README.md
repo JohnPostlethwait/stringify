@@ -10,7 +10,11 @@ npm install stringify
 
 ## Usage ##
 
-Use it directly from the command line `browserity -t stringify myfile.js` or setup Browserify to use this middleware in your app:
+### Browserify Command Line ###
+
+`browserity -t stringify myfile.js`
+
+### Browserify Middleware ###
 
 ```javascript
 var browserify = require('browserify'),
@@ -50,7 +54,7 @@ stringify({
 })
 ```
 
-__minifier__ options are optional.  
+__minifier__ options are optional.
 
 Default __minifier.extensions__:
 
