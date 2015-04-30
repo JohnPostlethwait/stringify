@@ -12,7 +12,7 @@ npm install stringify
 
 ### Browserify Command Line ###
 
-`browserity -t stringify myfile.js`
+`browserify -t stringify myfile.js`
 
 ### Browserify Middleware ###
 
