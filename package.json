@@ -27,12 +27,7 @@
   "engines": {
     "node": "*"
   },
-  "licenses": [
-    {
-      "name": "MIT",
-      "url": "http://opensource.org/licenses/mit-license.php"
-    }
-  ],
+  "license": "MIT",
   "dependencies": {
     "html-minifier": "^0.6.9",
     "stream-spec": "~0.3.5",
