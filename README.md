@@ -10,6 +10,27 @@ npm install stringify
 
 ## Usage ##
 
+### Register With Node Require ###
+
+```javascript
+var stringify = require('stringify');
+
+stringify.registerWithRequire({
+  extensions: ['.txt', '.html'],
+  minify: true,
+  minifier: {
+    extensions: ['.html'],
+    options: {
+      // html-minifier options
+    }
+  }
+});
+
+var myTextFile = require('./path/to/my/text/file.txt');
+
+console.log(myTextFile); // prints the contents of file.
+```
+
 ### Browserify Command Line ###
 
 `browserify -t stringify myfile.js`

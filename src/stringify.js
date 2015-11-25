@@ -1,5 +1,6 @@
 'use strict';
 var htmlMinifier = require('html-minifier'),
+    fs           = require('fs'),
     path         = require('path'),
     through      = require('through');
 
@@ -40,6 +41,8 @@ var DEFAULT_MINIFIER_OPTIONS = {
   minifyCSS: false,
   minifyURLs: false
 };
+
+var NODE_REQUIRE_OPTIONS = {};
 
 /**
  * Stringifies the content
@@ -125,6 +128,39 @@ function minify(filename, contents, options) {
   return contents;
 }
 
+/**
+ * Reads in a file and stringifies and minifies the contents.
+ * @param  {String} module
+ * @param  {String} filename
+ * @return {String}
+ */
+function requireStringify (module, filename) {
+  var contents;
+
+  try {
+    contents = fs.readFileSync(path.resolve(filename), 'utf8');
+  } catch (error) {
+    throw new Error('Cannot find module \'' + filename + '\'');
+  }
+
+  module.exports =  minify(filename, contents, NODE_REQUIRE_OPTIONS);
+}
+
+/**
+ * Registers the given extensions with node require.
+ * @param  {Object|Array} options
+ * @param  {Object.Array} options.extensions
+ * @return {void}
+ */
+function registerWithRequire (options) {
+  NODE_REQUIRE_OPTIONS = options || {};
+
+  var exts = getExtensions(NODE_REQUIRE_OPTIONS);
+  for (var i = 0; i < exts.length; i++) {
+    require.extensions[ exts[i] ] = requireStringify;
+  }
+}
+
 
 /**
  * Exposes the Browserify transform function.
@@ -179,8 +215,13 @@ module.exports = function (file, options) {
   }
 };
 
+// exports registerWithRequire so stringify can be registered with node require.
+module.exports.registerWithRequire = registerWithRequire;
+
 // Test-environment specific exports...
 if (process.env.NODE_ENV) {
+  module.exports.NODE_REQUIRE_OPTIONS        = NODE_REQUIRE_OPTIONS;
+  module.exports.requireStringify            = requireStringify;
   module.exports.stringify                   = stringify;
   module.exports.getExtensions               = getExtensions;
   module.exports.DEFAULT_EXTENSIONS          = DEFAULT_EXTENSIONS;

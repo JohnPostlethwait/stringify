@@ -36,6 +36,10 @@ describe('when the module is required', function () {
   it('should return a function', function () {
     stringify.should.be.a.Function;
   });
+
+  it('should have a method "registerWithRequire"', function () {
+    stringify.registerWithRequire.should.be.a.Function;
+  });
 });
 
 describe('when the module called', function () {
