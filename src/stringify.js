@@ -72,8 +72,7 @@ function getExtensions (options) {
       extensions = options;
     } else if (options.extensions && options.extensions._) {
       extensions = options.extensions._;
-    }
-    else if(options.extensions) { 
+    } else if(options.extensions) { 
       extensions = options.extensions
     }
   }
