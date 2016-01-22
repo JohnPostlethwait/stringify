@@ -71,10 +71,7 @@ function getExtensions (options) {
     if (Object.prototype.toString.call(options) === '[object Array]') {
       extensions = options;
     } else if (options.extensions) {
-      extensions = options.extensions;
-    }
-    else if( options.exts ) {
-      extensions = options.exts._;
+      extensions = options.extensions._;
     }
   }
 
