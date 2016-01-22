@@ -73,6 +73,9 @@ function getExtensions (options) {
     } else if (options.extensions) {
       extensions = options.extensions;
     }
+    else if( options.exts ) {
+      extensions = options.exts._;
+    }
   }
 
   // Lowercase all file extensions for case-insensitive matching.
