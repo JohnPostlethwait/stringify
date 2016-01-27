@@ -35,6 +35,10 @@ console.log(myTextFile); // prints the contents of file.
 
 `browserify -t stringify myfile.js`
 
+### Browserify Command Line extension options ###
+
+`browserify -t [ stringify --extensions [.html .hbs] ] myfile.js`
+
 ### Browserify Middleware ###
 
 ```javascript
