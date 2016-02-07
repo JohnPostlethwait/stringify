@@ -76,7 +76,6 @@ describe('when the module called', function () {
         minifier: {
           extensions: ['.xxx']
         }
-
       });
     });
 

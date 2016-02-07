@@ -1,8 +1,9 @@
 'use strict';
-var htmlMinifier = require('html-minifier'),
-    fs           = require('fs'),
-    path         = require('path'),
-    through      = require('through');
+var htmlMinifier  = require('html-minifier'),
+    StringDecoder = require('string_decoder').StringDecoder,
+    fs            = require('fs'),
+    path          = require('path'),
+    through       = require('through2');
 
 var DEFAULT_MINIFIER_EXTENSIONS = [
   '.html',
@@ -142,10 +143,10 @@ function requireStringify (module, filename) {
   try {
     contents = fs.readFileSync(path.resolve(filename), 'utf8');
   } catch (error) {
-    throw new Error('Cannot find module \'' + filename + '\'');
+    throw new Error('Stringify could not find module \'' + path.resolve(filename) + '\'.');
   }
 
-  module.exports =  minify(filename, contents, NODE_REQUIRE_OPTIONS);
+  module.exports = minify(filename, contents, NODE_REQUIRE_OPTIONS);
 }
 
 /**
@@ -158,6 +159,7 @@ function registerWithRequire (options) {
   NODE_REQUIRE_OPTIONS = options || {};
 
   var exts = getExtensions(NODE_REQUIRE_OPTIONS);
+
   for (var i = 0; i < exts.length; i++) {
     require.extensions[ exts[i] ] = requireStringify;
   }
@@ -190,17 +192,20 @@ module.exports = function (file, options) {
     if (!hasStringifiableExtension(file, extensions)) {
       return through();
     }
-    var chunks = [];
 
-    var write = function (buffer) {
-      chunks.push(buffer);
+    var write = function (buffer, enc, next) {
+      this.push(buffer.toString('utf8'));
+
+      next();
     };
 
-    var end = function () {
-      var contents = Buffer.concat(chunks).toString('utf8');
+    var end = function (callback) {
+      var decoder   = new StringDecoder('utf8'),
+          contents  = decoder.write(this);
 
-      this.queue(stringify(minify(file, contents, options)));
-      this.queue(null);
+      stringify(minify(file, contents, options));
+
+      callback();
     };
 
     return through(write, end);
