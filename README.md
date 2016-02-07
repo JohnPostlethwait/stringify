@@ -1,6 +1,7 @@
 # Stringify #
 
-Browserify plugin to require() text files (such as HTML templates) inside of your client-side JavaScript files.
+Browserify plugin to require() text files (such as HTML templates) inside of
+your client-side JavaScript files.
 
 ## Installation ##
 
@@ -10,32 +11,9 @@ npm install stringify
 
 ## Usage ##
 
-### Register With Node Require ###
+### Browserify ###
 
-```javascript
-var stringify = require('stringify');
-
-stringify.registerWithRequire({
-  extensions: ['.txt', '.html'],
-  minify: true,
-  minifier: {
-    extensions: ['.html'],
-    options: {
-      // html-minifier options
-    }
-  }
-});
-
-var myTextFile = require('./path/to/my/text/file.txt');
-
-console.log(myTextFile); // prints the contents of file.
-```
-
-### Browserify Command Line ###
-
-`browserify -t stringify myfile.js`
-
-### Browserify Command Line extension options ###
+#### Browserify Command Line ####
 
 `browserify -t [ stringify --extensions [.html .hbs] ] myfile.js`
 
@@ -52,11 +30,17 @@ var bundle = browserify()
 app.use(bundle);
 ```
 
-You might have noticed that you can pass stringify an optional array of file-extensions that you want to require() in your Browserify packages as strings. By default these are used: .html, .txt, .text, and .tmpl
+You might have noticed that you can pass stringify an optional array of
+file-extensions that you want to require() in your Browserify packages as
+strings. By default these are used: .html, .txt, .text, and .tmpl
 
-__NOTE__: You MUST call this as I have above. The Browserify .transform() method HAS to plug this middleware in to Browserify BEFORE you add the entry point (your main client-side file) for Browserify.
+__NOTE__: You MUST call this as I have above. The Browserify .transform() method
+HAS to plug this middleware in to Browserify BEFORE you add the entry point
+(your main client-side file) for Browserify.
 
-Now, in your clientside files you can use require() as you would for JSON and JavaScript files, but include text files that have just been parsed into a JavaScript string:
+Now, in your clientside files you can use require() as you would for JSON and
+JavaScript files, but include text files that have just been parsed into a
+JavaScript string:
 
 ```javascript
 var my_text = require('../path/to/my/text/file.txt');
@@ -64,7 +48,8 @@ var my_text = require('../path/to/my/text/file.txt');
 console.log(my_text);
 ```
 
-If you require an HTML file and you want to minify the requested string, you can configure Stringify to do it:
+If you require an HTML file and you want to minify the requested string, you can
+configure Stringify to do it:
 
 ```javascript
 stringify({
@@ -87,7 +72,9 @@ Default __minifier.extensions__:
 ['.html', '.htm', '.tmpl', '.tpl', '.hbs']
 ```
 
-Default __minifier.options__ (for more informations or to override those options, please go to [html-minifier github](https://github.com/kangax/html-minifier)):
+Default __minifier.options__ (for more informations or to override those
+options, please go to
+[html-minifier github](https://github.com/kangax/html-minifier)):
 
 ```javascript
 {
@@ -116,9 +103,10 @@ Default __minifier.options__ (for more informations or to override those options
 }
 ```
 
-## Usage with gulp and gulp-browserify
+### Gulp and Gulp-browserify ###
 
-To incorporate stringify into a `gulp` build process using `gulp-browserify`, register `stringify` as a transform as follows:
+To incorporate stringify into a `gulp` build process using `gulp-browserify`,
+register `stringify` as a transform as follows:
 
 ```javascript
 gulp.task('js', function() {
@@ -133,9 +121,35 @@ gulp.task('js', function() {
 });
 ```
 
-## More Realistic Example & Use-Case ##
+### NodeJS ###
 
-The reason I created this was to get string versions of my Handlebars templates required in to my client-side JavaScript. You can theoretically use this for any templating parser though.
+Allows you to "stringify" your non-JS files using the NodeJS module system.
+Please only use Stringify this way in NodeJS (Read: Not the browser/Browserify!)
+
+```javascript
+var stringify = require('stringify');
+
+stringify.registerWithRequire({
+  extensions: ['.txt', '.html'],
+  minify: true,
+  minifier: {
+    extensions: ['.html'],
+    options: {
+      // html-minifier options
+    }
+  }
+});
+
+var myTextFile = require('./path/to/my/text/file.txt');
+
+console.log(myTextFile); // prints the contents of file.
+```
+
+## Realistic Example/Use-Case ##
+
+The reason I created this was to get string versions of my Handlebars templates
+required in to my client-side JavaScript. You can theoretically use this for any
+templating parser though.
 
 Here is how that is done:
 
@@ -188,7 +202,8 @@ If you would like to contribute code, please do the following:
 5. Run the tests by running `npm install && make test` from the source directory.
 6. Assuming those pass, send the Pull Request off to me for review!
 
-Please do not iterate the package.json version number – I will do that myself when I publish it to NPM.
+Please do not iterate the package.json version number – I will do that myself
+when I publish it to NPM.
 
 ### Style-Guide ###
 
@@ -196,4 +211,5 @@ Please follow this simple style-guide for all code contributions:
 
 * Indent using spaces.
 * camelCase all callables.
+* Use semi-colons.
 * Place a space after a conditional or function name, and its conditions/arguments. `function (...) {...}`

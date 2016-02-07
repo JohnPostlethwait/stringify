@@ -70,7 +70,6 @@ describe('when the module called', function () {
 
   describe('with options as first argument', function () {
     before(function () {
-      console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxx');
       this.transformerFactory = stringify({
         extensions: ['.xxx'],
         minify: true,
