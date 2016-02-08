@@ -21,9 +21,11 @@ npm install stringify
 
 #### Browserify Command Line ####
 
-`browserify -t [ stringify --extensions [.html .hbs] ] myfile.js`
+```bash
+browserify -t [ stringify --extensions [.html .hbs] ] myfile.js
+```
 
-### Browserify Middleware ###
+#### Browserify Middleware ####
 
 ```javascript
 var browserify = require('browserify'),
@@ -109,20 +111,23 @@ options, please go to
 }
 ```
 
-### Gulp and Gulp-browserify ###
+#### Gulp and Browserify ####
 
-To incorporate stringify into a `gulp` build process using `gulp-browserify`,
+To incorporate stringify into a `gulp` build process using `browserify`,
 register `stringify` as a transform as follows:
 
 ```javascript
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
+var stringify = require('stringify');
+
 gulp.task('js', function() {
-  return gulp.src('src/main.js', { read: false })
-    .pipe(browserify({
-      transform: stringify({
+  return browserify({ 'entries': ['src/main.js'], 'debug' : env !== 'dev' })
+    .transform(stringify({
         extensions: ['.html'], minify: true
-      })
     }))
-    .pipe(gif(env !== 'dev', uglify()))
+    .bundle()
+    .pipe(source('main.js')) // gives streaming vinyl file object
     .pipe(gulp.dest(paths.build));
 });
 ```
