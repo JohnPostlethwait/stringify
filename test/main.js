@@ -83,7 +83,7 @@ describe('when the module called', function () {
       this.transformerFactory.name.should.be.exactly('browserifyTransform');
     });
 
-    it('should respond to input with the given options', function () {
+    it('should respond to input with the given options', function (done) {
       var transformer = this.transformerFactory('a_file.xxx');
       var s = spec(transformer).pausable();
 
@@ -92,6 +92,7 @@ describe('when the module called', function () {
         should(returnedData).be.an.array;
         should(returnedData.length).be.equal(1);
         should(returnedData[0]).be.equal(outputTransformed);
+        done();
       });
 
       transformer.on('close', s.validate);
@@ -118,7 +119,7 @@ describe('when the module called', function () {
       this.transformer.end.should.be.a.Function;
     });
 
-    it('should respond to input', function () {
+    it('should respond to input', function (done) {
       var s = spec(this.transformer).pausable();
 
       read(this.transformer, function (err, returnedData) {
@@ -126,6 +127,7 @@ describe('when the module called', function () {
         should(returnedData).be.an.array;
         should(returnedData.length).be.equal(1);
         should(returnedData[0]).be.equal(outputTransformed);
+        done();
       });
 
       this.transformer.on('close', s.validate);
@@ -146,7 +148,7 @@ describe('when the module called', function () {
       this.transformer.end.should.be.a.Function;
     });
 
-    it('should respond without transformation', function () {
+    it('should respond without transformation', function (done) {
       var s = spec(this.transformer).pausable();
 
       read(this.transformer, function (err, returnedData) {
@@ -154,6 +156,7 @@ describe('when the module called', function () {
         should(returnedData).be.an.array;
         should(returnedData.length).be.equal(1);
         should(returnedData[0]).be.equal(input);
+        done();
       });
 
       this.transformer.on('close', s.validate);
