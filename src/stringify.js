@@ -3,7 +3,7 @@ var htmlMinifier  = require('html-minifier'),
     StringDecoder = require('string_decoder').StringDecoder,
     fs            = require('fs'),
     path          = require('path'),
-    through       = require('through2');
+    through2       = require('through2');
 
 var DEFAULT_MINIFIER_EXTENSIONS = [
   '.html',
@@ -187,28 +187,25 @@ module.exports = function (file, options) {
    * @returns {stream}
    */
   function browserifyTransform (file) {
-    var extensions = getExtensions(options);
+    var extensions = getExtensions(options),
+        contents = '',
+        decoder = new StringDecoder('utf8');
 
     if (!hasStringifiableExtension(file, extensions)) {
-      return through();
+      return through2({ objectMode: true });
     }
 
     var write = function (buffer, enc, next) {
-      this.push(buffer.toString('utf8'));
-
+      contents += decoder.write(buffer);
       next();
     };
 
     var end = function (callback) {
-      var decoder   = new StringDecoder('utf8'),
-          contents  = decoder.write(this);
-
-      stringify(minify(file, contents, options));
-
+      this.push(stringify(minify(file, contents, options)));
       callback();
     };
 
-    return through(write, end);
+    return through2({ objectMode: true }, write, end);
   }
 
   if (typeof file !== 'string') {
