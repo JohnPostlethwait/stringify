@@ -32,15 +32,13 @@ var browserify = require('browserify'),
     stringify = require('stringify');
 
 var bundle = browserify()
-    .transform(stringify(['.hjs', '.html', '.whatever']))
+    .transform(stringify, {
+      appliesTo: { includeExtensions: ['.hjs', '.html', '.whatever'] }
+    })
     .add('my_app_main.js');
 
 app.use(bundle);
 ```
-
-You might have noticed that you can pass stringify an optional array of
-file-extensions that you want to require() in your Browserify packages as
-strings. By default these are used: .html, .txt, .text, and .tmpl
 
 __NOTE__: You MUST call this as I have above. The Browserify .transform() method
 HAS to plug this middleware in to Browserify BEFORE you add the entry point
@@ -56,60 +54,6 @@ var my_text = require('../path/to/my/text/file.txt');
 console.log(my_text);
 ```
 
-If you require an HTML file and you want to minify the requested string, you can
-configure Stringify to do it:
-
-```javascript
-stringify({
-  extensions: ['.txt', '.html'],
-  minify: true,
-  minifier: {
-    extensions: ['.html'],
-    options: {
-      // html-minifier options
-    }
-  }
-})
-```
-
-__minifier__ options are optional.
-
-Default __minifier.extensions__:
-
-```javascript
-['.html', '.htm', '.tmpl', '.tpl', '.hbs']
-```
-
-Default __minifier.options__ (for more informations or to override those
-options, please go to
-[html-minifier github](https://github.com/kangax/html-minifier)):
-
-```javascript
-{
-  removeComments: true,
-  removeCommentsFromCDATA: true,
-  removeCDATASectionsFromCDATA: true,
-  collapseWhitespace: true,
-  conservativeCollapse: false,
-  preserveLineBreaks: false,
-  collapseBooleanAttributes: false,
-  removeAttributeQuotes: true,
-  removeRedundantAttributes: false,
-  useShortDoctype: false,
-  removeEmptyAttributes: false,
-  removeScriptTypeAttributes: false,
-  removeStyleLinkTypeAttributes: false,
-  removeOptionalTags: false,
-  removeIgnored: false,
-  removeEmptyElements: false,
-  lint: false,
-  keepClosingSlash: false,
-  caseSensitive: false,
-  minifyJS: false,
-  minifyCSS: false,
-  minifyURLs: false
-}
-```
 
 #### Gulp and Browserify ####
 
@@ -117,15 +61,16 @@ To incorporate stringify into a `gulp` build process using `browserify`,
 register `stringify` as a transform as follows:
 
 ```javascript
-var browserify = require('browserify');
-var source = require('vinyl-source-stream');
-var stringify = require('stringify');
+var browserify = require('browserify'),
+    source = require('vinyl-source-stream'),
+    stringify = require('stringify');
 
 gulp.task('js', function() {
   return browserify({ 'entries': ['src/main.js'], 'debug' : env !== 'dev' })
-    .transform(stringify({
-        extensions: ['.html'], minify: true
-    }))
+    .transform(stringify, {
+        appliesTo: { includeExtensions: ['.html'] },
+        minify: true
+    })
     .bundle()
     .pipe(source('main.js')) // gives streaming vinyl file object
     .pipe(gulp.dest(paths.build));
@@ -156,6 +101,131 @@ var myTextFile = require('./path/to/my/text/file.txt');
 console.log(myTextFile); // prints the contents of file.
 ```
 
+## Configuration ##
+
+### Loading Configuration from package.json ###
+
+When package.json is found, configuration is loaded by finding a key in the package.json with the name __"stringify"__ as your transform.
+
+```javascript
+{
+    "name": "myProject",
+    "version": "1.0.0",
+    ...
+    "stringify": {
+        "appliesTo": { "includeExtensions": [".html"] },
+        "minify": true
+    }
+}
+```
+
+Or alternatively you can set the __"stringify"__ key to be a <kbd>.js</kbd> or
+<kbd>.json</kbd> file:
+
+```javascript
+{
+    "name": "myProject",
+    "version": "1.0.0",
+    ...
+    "stringify": "stringifyConfig.js"
+}
+```
+
+And then configuration will be loaded from that file:
+
+```javascript
+module.exports = {
+    "appliesTo": { "includeExtensions": [".html"] },
+    "minify": true
+};
+```
+
+For more details about package.json configuration, see the Browserify Transform
+Tools
+[configuration documentation](https://github.com/benbria/browserify-transform-tools/wiki/Transform-Configuration#loading-configuration-from-packagejson).
+
+
+### Including / Excluding Files ###
+
+The configuration option __appliesTo__ is used to configure which files should
+be included or excluded.  The default included extensions are:
+
+```javascript
+['.html', '.htm', '.tmpl', '.tpl', '.hbs', '.text', '.txt']
+```
+
+The __appliesTo__ should include exactly one of the following:
+
+| Option                        | Description                   |
+| ----------------------------- | ----------------------------- |
+| <kbd>.includeExtensions</kbd> | If this option is specified, then any file with an extension not in this list will skipped.  |
+| <kbd>.excludeExtensions</kbd> | A list of extensions which will be skipped.  |
+| <kbd>.files</kbd>             | A list of paths, relative to the configuration file, of files which should be transformed.  Only these files will be transformed. |
+| <kbd>.regex</kbd>             | A regex or a list of regexes.  If any regex matches the full path of the file, then the file will be processed, otherwise not.  |
+
+For more details about the __appliesTo__ configuration property, see the
+Browserify Transform Tools
+[configuration documentation](https://github.com/benbria/browserify-transform-tools/wiki/Transform-Configuration#common-configuration).
+
+
+### Minification ###
+
+By default, files will not get minified - setting __minify__ configuration
+option to true will enable this. The __minifier__ configuration option is used
+to set additional options.
+
+The default value of __minifier.extensions__ is:
+
+```javascript
+['.html', '.htm', '.tmpl', '.tpl', '.hbs']
+```
+The __minifier.options__ are passed through to html-minifier (for more informations or to override those
+options, please go to [html-minifier github](https://github.com/kangax/html-minifier)).
+
+The default value of __minifier.options__ is:
+
+```javascript
+{
+  removeComments: true,
+  removeCommentsFromCDATA: true,
+  removeCDATASectionsFromCDATA: true,
+  collapseWhitespace: true,
+  conservativeCollapse: false,
+  preserveLineBreaks: false,
+  collapseBooleanAttributes: false,
+  removeAttributeQuotes: true,
+  removeRedundantAttributes: false,
+  useShortDoctype: false,
+  removeEmptyAttributes: false,
+  removeScriptTypeAttributes: false,
+  removeStyleLinkTypeAttributes: false,
+  removeOptionalTags: false,
+  removeIgnored: false,
+  removeEmptyElements: false,
+  lint: false,
+  keepClosingSlash: false,
+  caseSensitive: false,
+  minifyJS: false,
+  minifyCSS: false,
+  minifyURLs: false
+}
+```
+If you require an HTML file and you want to minify the requested string, you can
+configure Stringify to do it:
+
+```javascript
+stringify({
+  appliesTo: { includeExtensions: ['.txt', '.html'] },
+  minify: true,
+  minifier: {
+    extensions: ['.html'],
+    options: {
+      // html-minifier options
+    }
+  }
+})
+```
+
 ## Realistic Example/Use-Case ##
 
 The reason I created this was to get string versions of my Handlebars templates
@@ -170,7 +240,9 @@ var browserify = require('browserify'),
     stringify = require('stringify');
 
 var bundle = browserify()
-    .transform(stringify(['.hbs', '.handlebars']))
+    .transform(stringify, {
+      appliesTo: { includeExtensions: ['.hbs', '.handlebars'] }
+    })
     .addEntry('my_app_main.js');
 
 app.use(bundle);
@@ -201,6 +273,7 @@ my/template/path.hbs:
 ```html
 <p>{{ json_data }}</p>
 ```
+
 
 ## Contributing ##
 
