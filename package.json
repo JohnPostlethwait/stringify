@@ -16,6 +16,7 @@
   "website": "http://johnpostlethwait.github.com/stringify/",
   "keywords": [
     "browserify",
+    "browserify-transform",
     "require",
     "template",
     "text",
