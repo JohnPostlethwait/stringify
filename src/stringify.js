@@ -1,9 +1,8 @@
 'use strict';
 var htmlMinifier  = require('html-minifier'),
-    StringDecoder = require('string_decoder').StringDecoder,
     fs            = require('fs'),
     path          = require('path'),
-    through2       = require('through2');
+    tools         = require('browserify-transform-tools');
 
 var DEFAULT_MINIFIER_EXTENSIONS = [
   '.html',
@@ -13,10 +12,12 @@ var DEFAULT_MINIFIER_EXTENSIONS = [
   '.hbs'
 ];
 
-var DEFAULT_EXTENSIONS = DEFAULT_MINIFIER_EXTENSIONS.concat([
-  '.text',
-  '.txt'
-]);
+var TRANSFORM_OPTIONS = {
+  includeExtensions: DEFAULT_MINIFIER_EXTENSIONS.concat([
+    '.text',
+    '.txt'
+  ])
+};
 
 var DEFAULT_MINIFIER_OPTIONS = {
   removeComments: true,
@@ -55,6 +56,30 @@ function stringify (content) {
 }
 
 /**
+ * Takes a set of user-supplied options, and ensure file configuration
+ * settings is in the correct form for 'browserify-transform-tools'.
+ * @param   {object | array}    options
+ * @returns {object}
+ */
+function getTransformOptions (options) {
+  if (!options) {
+    return {};
+  }
+
+  if (Object.prototype.toString.call(options) === '[object Array]') {
+    options = { appliesTo: { includeExtensions: options }  };
+  }
+
+  if (options.extensions && !options.appliesTo) {
+    var extensions = options.extensions._ || options.extensions;
+    options.appliesTo = { includeExtensions: extensions };
+    delete options.extensions;
+  }
+
+  return options;
+}
+
+/**
  * Takes a set of user-supplied options, and determines which set of file-
  * extensions to run Stringify on.
  * @param   {object | array}    options
@@ -66,7 +91,7 @@ function getExtensions (options) {
    * The file extensions which are stringified by default.
    * @type    {string[]}
    */
-  var extensions = DEFAULT_EXTENSIONS;
+  var extensions = TRANSFORM_OPTIONS.includeExtensions;
 
   if (options) {
     if (Object.prototype.toString.call(options) === '[object Array]') {
@@ -133,9 +158,9 @@ function minify(filename, contents, options) {
 
 /**
  * Reads in a file and stringifies and minifies the contents.
- * @param  {String} module
- * @param  {String} filename
- * @return {String}
+ * @param  {string} module
+ * @param  {string} filename
+ * @return {string}
  */
 function requireStringify (module, filename) {
   var contents;
@@ -151,8 +176,7 @@ function requireStringify (module, filename) {
 
 /**
  * Registers the given extensions with node require.
- * @param  {Object|Array} options
- * @param  {Object.Array} options.extensions
+ * @param  {object | array} options
  * @return {void}
  */
 function registerWithRequire (options) {
@@ -165,6 +189,30 @@ function registerWithRequire (options) {
   }
 }
 
+/**
+ * Function which is called to do the transform.
+ *
+ * - `contents` are the contents of the file.
+ * - `transformOptions.file` is the name of the file (as would be
+ *   passed to a normal browserify transform.)
+ * - `transformOptions.config` is the configuration data that has been
+ *   automatically loaded.  For details, see the transform configuration documentation
+ *   (https://github.com/benbria/browserify-transform-tools/wiki/Transform-Configuration).
+ * - `transformOptions.config` is a copy of
+ * - `done(err, transformed)` is a callback which must be called, passing a
+ *   string with the transformed contents of the file.
+ *
+ * @param  {string} content
+ * @param  {object} transformOptions
+ * @param  {function} done
+ * @returns {void}
+ */
+function transformFn (contents, transformOptions, done) {
+  var file = transformOptions.file,
+      options = transformOptions.config;
+
+  done(null, stringify(minify(file, contents, options)));
+}
 
 /**
  * Exposes the Browserify transform function.
@@ -180,42 +228,16 @@ function registerWithRequire (options) {
  * @returns {stream | function} depending on if first argument is string.
  */
 module.exports = function (file, options) {
-
-  /**
-   * The function Browserify will use to transform the input.
-   * @param   {string} file
-   * @returns {stream}
-   */
-  function browserifyTransform (file) {
-    var extensions = getExtensions(options),
-        contents = '',
-        decoder = new StringDecoder('utf8');
-
-    if (!hasStringifiableExtension(file, extensions)) {
-      return through2({ objectMode: true });
-    }
-
-    var write = function (buffer, enc, next) {
-      contents += decoder.write(buffer);
-      next();
-    };
-
-    var end = function (callback) {
-      this.push(stringify(minify(file, contents, options)));
-      callback();
-    };
-
-    return through2({ objectMode: true }, write, end);
-  }
+  var transform = tools.makeStringTransform('stringify', TRANSFORM_OPTIONS, transformFn);
 
   if (typeof file !== 'string') {
     // Factory: return a function.
     // Set options variable here so it is ready for when browserifyTransform
     // is called. Note: first argument is the options.
-    options = file;
-    return browserifyTransform;
+    var capturedOptions = getTransformOptions(file);
+    return function (file) { return transform(file, capturedOptions); };
   } else {
-    return browserifyTransform(file);
+    return transform(file, getTransformOptions(options));
   }
 };
 
@@ -228,7 +250,8 @@ if (process.env.NODE_ENV) {
   module.exports.requireStringify            = requireStringify;
   module.exports.stringify                   = stringify;
   module.exports.getExtensions               = getExtensions;
-  module.exports.DEFAULT_EXTENSIONS          = DEFAULT_EXTENSIONS;
+  module.exports.getTransformOptions         = getTransformOptions;
+  module.exports.TRANSFORM_OPTIONS           = TRANSFORM_OPTIONS;
   module.exports.hasStringifiableExtension   = hasStringifiableExtension;
   module.exports.minify                      = minify;
   module.exports.getMinifierOptions          = getMinifierOptions;

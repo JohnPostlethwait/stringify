@@ -20,12 +20,12 @@ describe('the "getExtensions" function', function () {
 
   describe('when passed no options argument', function () {
     before(function () {
-      this.correct_test_extensions = Stringify.DEFAULT_EXTENSIONS;
+      this.correct_test_extensions = Stringify.TRANSFORM_OPTIONS.includeExtensions;
       this.returned_extensions = Stringify.getExtensions();
     });
 
     assertNonEmptyArrayInReturnedExtensions();
-    assertCorrectExtensionsReturned(Stringify.DEFAULT_EXTENSIONS);
+    assertCorrectExtensionsReturned();
   });
 
   describe('when passed an array of file-extensions as an options argument', function () {
