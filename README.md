@@ -88,11 +88,11 @@ var stringify = require('stringify');
 stringify.registerWithRequire({
   extensions: ['.txt', '.html'],
   minify: true,
-  minifier: {
-    extensions: ['.html'],
-    options: {
-      // html-minifier options
-    }
+  minifyAppliesTo: {
+    includeExtensions: ['.html']
+  },
+  minifyOptions: {
+    // html-minifier options
   }
 });
 
@@ -171,18 +171,22 @@ Browserify Transform Tools
 ### Minification ###
 
 By default, files will not get minified - setting __minify__ configuration
-option to true will enable this. The __minifier__ configuration option is used
-to set additional options.
+option to true will enable this.
 
-The default value of __minifier.extensions__ is:
+The __minifyAppliesTo__ configuration option allows files to be included or
+excluded from the minifier in a similar way to __appliesTo__ (see _Including
+/ Excluding Files_ section for more details).
+
+The default included file extensions are:
 
 ```javascript
 ['.html', '.htm', '.tmpl', '.tpl', '.hbs']
 ```
-The __minifier.options__ are passed through to html-minifier (for more informations or to override those
-options, please go to [html-minifier github](https://github.com/kangax/html-minifier)).
+The options set in the __minifyOptions__ configuration option are passed
+through to html-minifier (for more informations or to override those options,
+please go to [html-minifier github](https://github.com/kangax/html-minifier)).
 
-The default value of __minifier.options__ is:
+The default value of __minifyOptions__ is:
 
 ```javascript
 {
@@ -217,11 +221,11 @@ configure Stringify to do it:
 stringify({
   appliesTo: { includeExtensions: ['.txt', '.html'] },
   minify: true,
-  minifier: {
-    extensions: ['.html'],
-    options: {
-      // html-minifier options
-    }
+  minifyAppliesTo: {
+    includeExtensions: ['.html']
+  },
+  minifyOptions: {
+    // html-minifier options
   }
 })
 ```

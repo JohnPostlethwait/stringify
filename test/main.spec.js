@@ -69,8 +69,8 @@ describe('the main function called', function () {
       this.transformerFactory = stringify({
         appliesTo: { includeExtensions: ['.xxx'] },
         minify: true,
-        minifier: {
-          extensions: ['.xxx']
+        minifyAppliesTo: {
+          includeExtensions: ['.xxx']
         }
       });
     });
