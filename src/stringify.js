@@ -4,22 +4,24 @@ var htmlMinifier  = require('html-minifier'),
     path          = require('path'),
     tools         = require('browserify-transform-tools');
 
-var DEFAULT_MINIFIER_EXTENSIONS = [
-  '.html',
-  '.htm',
-  '.tmpl',
-  '.tpl',
-  '.hbs'
-];
+var MINIFY_TRANSFORM_OPTIONS = {
+  includeExtensions: [
+    '.html',
+    '.htm',
+    '.tmpl',
+    '.tpl',
+    '.hbs'
+  ]
+};
 
 var TRANSFORM_OPTIONS = {
-  includeExtensions: DEFAULT_MINIFIER_EXTENSIONS.concat([
+  includeExtensions: MINIFY_TRANSFORM_OPTIONS.includeExtensions.concat([
     '.text',
     '.txt'
   ])
 };
 
-var DEFAULT_MINIFIER_OPTIONS = {
+var DEFAULT_MINIFY_OPTIONS = {
   removeComments: true,
   removeCommentsFromCDATA: true,
   removeCDATASectionsFromCDATA: true,
@@ -114,29 +116,30 @@ function getExtensions (options) {
 /**
  * Provides user or default options for html-minifier module
  * @param   {object}    options
- * @param   {object}    options.minifier
  * @returns {object}
  */
-function getMinifierOptions (_options) {
-  var options = _options || {};
-  var minifier = options.minifier || {};
-  return {
-    requested : !!options.minify,
-    extensions: minifier.extensions || DEFAULT_MINIFIER_EXTENSIONS,
-    options: minifier.options || DEFAULT_MINIFIER_OPTIONS
-  };
-}
+function getMinifyOptions (options) {
+  if (!options || !options.minify) {
+    return { requested: false };
+  }
 
-/**
- * Returns whether the filename ends in a Stringifiable extension. Case
- * insensitive.
- * @param   {string} filename
- * @return  {boolean}
- */
-function hasStringifiableExtension (filename, extensions) {
-  var file_extension = path.extname(filename).toLowerCase();
+  var minifierOpts = options.minifier,
+      minify = { requested: true, options: DEFAULT_MINIFY_OPTIONS };
 
-  return extensions.indexOf(file_extension) > -1;
+  if (options.minifyAppliesTo) {
+    minify.config = { appliesTo: options.minifyAppliesTo };
+  } else if (minifierOpts && minifierOpts.extensions) {
+    var extensions = minifierOpts.extensions._ || options.minifier.extensions;
+    minify.config = { appliesTo: { includeExtensions: extensions } };
+  }
+
+  if (options.minifyOptions) {
+    minify.options = options.minifyOptions;
+  } else if (minifierOpts && minifierOpts.options) {
+    minify.options = minifierOpts.options;
+  }
+
+  return minify;
 }
 
 /**
@@ -147,10 +150,12 @@ function hasStringifiableExtension (filename, extensions) {
  * @return  {string}
  */
 function minify(filename, contents, options) {
-  var minifier = getMinifierOptions(options);
+  var minifier = getMinifyOptions(options);
 
-  if (minifier.requested && hasStringifiableExtension(filename, minifier.extensions)) {
-    return htmlMinifier.minify(contents, minifier.options);
+  if (minifier.requested) {
+    if (!tools.skipFile(filename, minifier.config, MINIFY_TRANSFORM_OPTIONS)) {
+      return htmlMinifier.minify(contents, minifier.options);
+    }
   }
 
   return contents;
@@ -252,9 +257,8 @@ if (process.env.NODE_ENV) {
   module.exports.getExtensions               = getExtensions;
   module.exports.getTransformOptions         = getTransformOptions;
   module.exports.TRANSFORM_OPTIONS           = TRANSFORM_OPTIONS;
-  module.exports.hasStringifiableExtension   = hasStringifiableExtension;
   module.exports.minify                      = minify;
-  module.exports.getMinifierOptions          = getMinifierOptions;
-  module.exports.DEFAULT_MINIFIER_EXTENSIONS = DEFAULT_MINIFIER_EXTENSIONS;
-  module.exports.DEFAULT_MINIFIER_OPTIONS    = DEFAULT_MINIFIER_OPTIONS;
+  module.exports.getMinifyOptions            = getMinifyOptions;
+  module.exports.MINIFY_TRANSFORM_OPTIONS    = MINIFY_TRANSFORM_OPTIONS;
+  module.exports.DEFAULT_MINIFY_OPTIONS      = DEFAULT_MINIFY_OPTIONS;
 }
