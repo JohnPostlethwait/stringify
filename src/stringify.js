@@ -88,21 +88,11 @@ function getTransformOptions (options) {
  * @param   {object}            options.extensions
  * @returns {string[]}
  */
-function getExtensions (options) {
-  /**
-   * The file extensions which are stringified by default.
-   * @type    {string[]}
-   */
+function getRequireExtensions (options) {
   var extensions = TRANSFORM_OPTIONS.includeExtensions;
 
-  if (options) {
-    if (Object.prototype.toString.call(options) === '[object Array]') {
-      extensions = options;
-    } else if (options.extensions && options.extensions._) {
-      extensions = options.extensions._;
-    } else if(options.extensions) {
-      extensions = options.extensions;
-    }
+  if (options && options.appliesTo && options.appliesTo.includeExtensions) {
+    extensions = options.appliesTo.includeExtensions;
   }
 
   // Lowercase all file extensions for case-insensitive matching.
@@ -185,9 +175,9 @@ function requireStringify (module, filename) {
  * @return {void}
  */
 function registerWithRequire (options) {
-  NODE_REQUIRE_OPTIONS = options || {};
+  NODE_REQUIRE_OPTIONS = getTransformOptions(options);
 
-  var exts = getExtensions(NODE_REQUIRE_OPTIONS);
+  var exts = getRequireExtensions(NODE_REQUIRE_OPTIONS);
 
   for (var i = 0; i < exts.length; i++) {
     require.extensions[ exts[i] ] = requireStringify;
@@ -254,7 +244,7 @@ if (process.env.NODE_ENV) {
   module.exports.NODE_REQUIRE_OPTIONS        = NODE_REQUIRE_OPTIONS;
   module.exports.requireStringify            = requireStringify;
   module.exports.stringify                   = stringify;
-  module.exports.getExtensions               = getExtensions;
+  module.exports.getRequireExtensions        = getRequireExtensions;
   module.exports.getTransformOptions         = getTransformOptions;
   module.exports.TRANSFORM_OPTIONS           = TRANSFORM_OPTIONS;
   module.exports.minify                      = minify;
