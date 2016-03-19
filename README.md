@@ -1,6 +1,7 @@
 # Stringify #
 
 [![NPM](https://nodei.co/npm/stringify.png?downloads&downloadRank)](https://nodei.co/npm/stringify/)
+[![Build Status][travis-image]][travis-url]
 
 Browserify plugin to require() text files (such as HTML templates) inside of
 your client-side JavaScript files.
@@ -301,3 +302,6 @@ Please follow this simple style-guide for all code contributions:
 * camelCase all callables.
 * Use semi-colons.
 * Place a space after a conditional or function name, and its conditions/arguments. `function (...) {...}`
+
+[travis-url]: https://travis-ci.org/JohnPostlethwait/stringify
+[travis-image]: https://img.shields.io/travis/JohnPostlethwait/stringify.svg
