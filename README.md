@@ -86,7 +86,7 @@ Please only use Stringify this way in NodeJS (Read: Not the browser/Browserify!)
 var stringify = require('stringify');
 
 stringify.registerWithRequire({
-  extensions: ['.txt', '.html'],
+  appliesTo: { includeExtensions: ['.txt', '.html'] },
   minify: true,
   minifyAppliesTo: {
     includeExtensions: ['.html']
@@ -100,6 +100,10 @@ var myTextFile = require('./path/to/my/text/file.txt');
 
 console.log(myTextFile); // prints the contents of file.
 ```
+
+For NodeJS, the __appliesTo__ configuration option only supports the
+__includeExtensions__ option - see _Including / Excluding Files_ section for
+further details.
 
 ## Configuration ##
 
