@@ -1,5 +1,7 @@
 # Stringify #
 
+_**NOTE:** I no longer actively maintain this package. I'd love to get PRs to keep it going though!_
+
 [![NPM](https://nodei.co/npm/stringify.png?downloads&downloadRank)](https://nodei.co/npm/stringify/)
 [![Build Status][travis-image]][travis-url]
 
