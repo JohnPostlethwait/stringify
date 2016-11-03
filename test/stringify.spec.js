@@ -10,7 +10,7 @@ describe('the "stringify" function', function () {
       'This is my test string HTML!</h1></body></html>';
   });
 
-  describe('called with no XXX (default)', function () {
+  describe('called without exportAsEs6Default option (default)', function () {
     before(function () {
       this.stringified_content = Stringify.stringify(this.test_string);
     });
