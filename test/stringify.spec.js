@@ -39,8 +39,8 @@ describe('the "stringify" function', function () {
     });
 
     it('should begin with module.default = "', function () {
-      console.log(this.stringified_content);
-      this.stringified_content.should.startWith('exports.default = "');
+      this.stringified_content.should.startWith(
+        'Object.defineProperty(exports, "__esModule", { value: true });\nexports.default = "');
     });
   });
 });

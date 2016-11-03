@@ -55,7 +55,8 @@ var NODE_REQUIRE_OPTIONS = {};
  * @returns {string}
  */
 function stringify (content, exportAsEs6Default) {
-  var exportsString = exportAsEs6Default? 'exports.default' : 'module.exports';
+  var exportsString = exportAsEs6Default ? 'Object.defineProperty(exports, "__esModule", { value: true });\n' +
+  'exports.default' : 'module.exports';
 
   return exportsString + ' = ' + JSON.stringify(content) + ';\n';
 }
