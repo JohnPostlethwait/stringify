@@ -50,11 +50,14 @@ var NODE_REQUIRE_OPTIONS = {};
 
 /**
  * Stringifies the content
- * @param   {string}    content
+ * @param {string} content
+ * @param {boolean} exportAsEs6Default
  * @returns {string}
  */
-function stringify (content) {
-  return 'module.exports = ' + JSON.stringify(content) + ';\n';
+function stringify (content, exportAsEs6Default) {
+  var exportsString = exportAsEs6Default? 'exports.default' : 'module.exports';
+
+  return exportsString + ' = ' + JSON.stringify(content) + ';\n';
 }
 
 /**
@@ -197,7 +200,7 @@ function registerWithRequire (options) {
  * - `done(err, transformed)` is a callback which must be called, passing a
  *   string with the transformed contents of the file.
  *
- * @param  {string} content
+ * @param  {string} contents
  * @param  {object} transformOptions
  * @param  {function} done
  * @returns {void}
@@ -206,7 +209,7 @@ function transformFn (contents, transformOptions, done) {
   var file = transformOptions.file,
       options = transformOptions.config;
 
-  done(null, stringify(minify(file, contents, options)));
+  done(null, stringify(minify(file, contents, options), options.exportAsEs6Default));
 }
 
 /**

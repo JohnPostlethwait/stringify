@@ -237,6 +237,16 @@ stringify({
 })
 ```
 
+### Export format ###
+By default HTML is exported with ```module.exports```, but you can use ```exportAsEs6Default``` flag to export it as ES6 default export (via ```exports.default```).
+
+```javascript
+stringify({
+  appliesTo: { includeExtensions: ['.txt', '.html'] },
+  exportAsEs6Default: true
+})
+```
+
 ## Realistic Example/Use-Case ##
 
 The reason I created this was to get string versions of my Handlebars templates
