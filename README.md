@@ -9,7 +9,7 @@ Browserify plugin to require() text files (such as HTML templates) inside of
 your client-side JavaScript files.
 
 *NOTE:* Has not been tested on Node below version 4.0.0, and has been tested up
-to Node 5.5.0. Please report (or put a Pull Request up for) any bugs you may
+to Node 8.1.3. Please report (or put a Pull Request up for) any bugs you may
 find.
 
 ## Installation ##
