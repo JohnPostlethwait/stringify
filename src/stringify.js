@@ -124,7 +124,12 @@ function getMinifyOptions (options) {
   }
 
   if (options.minifyOptions) {
-    minify.options = options.minifyOptions;
+    for (var opt in options.minifyOptions) {
+      if (typeof minify.options[opt] === 'boolean') { // the flag needs to be an existing default
+        // accomadate the fact that a string value for the flag comes from the cli
+        minify.options[opt] = options.minifyOptions[opt] === 'true' || options.minifyOptions[opt] === true;
+      }
+    }
   } else if (minifierOpts && minifierOpts.options) {
     minify.options = minifierOpts.options;
   }
